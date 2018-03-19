@@ -2,13 +2,11 @@ module Babylon.Types
        ( Node(..)
        , Node'
        , ForInStatement'
-       , FunctionDeclaration'
        , Function'
        , ObjectProperty'
        , ObjectMember
        , BinaryExpression'
        , CallExpression'
-       , ClassDeclaration'
        , Class
        , ImportSpecifier
        , ModuleSpecifier
@@ -27,97 +25,104 @@ module Babylon.Types
 
 import Prelude
 
-import Data.Either (Either(..), either)
+import Control.Alt ((<|>))
+import Data.Either (Either(..))
+import Data.Foreign (F, Foreign, ForeignError(..), fail)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.Traversable (foldl)
+import Simple.JSON (class ReadForeign, read, read')
 
 
--- data Statement n = ExpressionStatement n
---                  | BlockStatement n
---                  | EmptyStatement n
---                  | DebuggerStatement n
---                  | WithStatement n
---                  | ReturnStatement n
---                  | LabeledStatement n
---                  | BreakStatement n
---                  | ContinueStatement n
---                  | IfStatement n
---                  | SwitchStatement n
---                  | SwitchCase n
---                  | ThrowStatement n
---                  | TryStatement n
---                  | CatchClause n
---                  | WhileStatement n
---                  | DoWhileStatement n
---                  | ForStatement n
---                  | ForInStatement n
---                  | ForOfStatement n
---                  | FunctionDeclaration n
---                  | VariableDeclaration n
---                  | VariableDeclarator n
---                  | Decorator n
---                  | Directive n
---                  | DirectiveLiteral n
-
--- data Expression n = Super n
---                   | Import n
---                   | ThisExpression n
---                   | ArrowFunctionExpression n
---                   | YieldExpression n
---                   | AwaitExpression n
---                   | ArrayExpression n
---                   | ObjectExpression n
---                   | ObjectProperty n
---                   | ObjectMethod n
---                   | FunctionExpression n
---                   | UnaryExpression n
---                   | UpdateExpression n
---                   | BinaryExpression n
---                   | AssignmentExpression n
---                   | LogicalExpression n
---                   | SpreadElement n
---                   | MemberExpression n
---                   | BindExpression n
---                   | ConditionalExpression n
---                   | CallExpression n
---                   | NewExpression n
---                   | SequenceExpression n
---                   | DoExpression n
---                   | TemplateLiteral n
---                   | TaggedTemplateLiteral n
---                   | TemplateElement n
-
--- data Literal n = RegExpLiteral n
---                | NullLiteral n
---                | StringLiteral  n
---                | BooleanLiteral n
---                | NumericLiteral n
-
-{-
-interface Node {
-  type: string;
-  loc: SourceLocation | null;
-}
-
-interface SourceLocation {
-  source: string | null;
-  start: Position;
-  end: Position;
-}
-
-interface Position {
-  line: number; // >= 1
-  column: number; // >= 0
-}
-
-interface Identifier <: Expression, Pattern {
-  type: "Identifier";
-  name: string;
-}
-
-
--}
+instance readForeignNode :: ReadForeign Node where
+  readImpl f = do
+    r :: {type :: String} <- read' f
+    case r."type" of
+      "Identifier"               -> Identifier               <$> read' f
+      "PrivateName"              -> PrivateName              <$> read' f
+      "RegExpLiteral"            -> RegExpLiteral            <$> read' f
+      "NullLiteral"              -> NullLiteral              <$> read' f
+      "StringLiteral"            -> StringLiteral            <$> read' f
+      "BooleanLiteral"           -> BooleanLiteral           <$> read' f
+      "NumericLiteral"           -> NumericLiteral           <$> read' f
+      "Program"                  -> Program                  <$> read' f
+      "ExpressionStatement"      -> ExpressionStatement      <$> read' f
+      "BlockStatement"           -> BlockStatement           <$> read' f
+      "EmptyStatement"           -> EmptyStatement           <$> read' f
+      "DebuggerStatement"        -> DebuggerStatement        <$> read' f
+      "WithStatement"            -> WithStatement            <$> read' f
+      "ReturnStatement"          -> ReturnStatement          <$> read' f
+      "LabeledStatement"         -> LabeledStatement         <$> read' f
+      "BreakStatement"           -> BreakStatement           <$> read' f
+      "ContinueStatement"        -> ContinueStatement        <$> read' f
+      "IfStatement"              -> IfStatement              <$> read' f
+      "SwitchStatement"          -> SwitchStatement          <$> read' f
+      "SwitchCase"               -> SwitchCase               <$> read' f
+      "ThrowStatement"           -> ThrowStatement           <$> read' f
+      "TryStatement"             -> TryStatement             <$> read' f
+      "CatchClause"              -> CatchClause              <$> read' f
+      "WhileStatement"           -> WhileStatement           <$> read' f
+      "DoWhileStatement"         -> DoWhileStatement         <$> read' f
+      "ForStatement"             -> ForStatement             <$> read' f
+      "ForInStatement"           -> ForInStatement           <$> read' f
+      "ForOfStatement"           -> ForOfStatement           <$> read' f
+      "FunctionDeclaration"      -> FunctionDeclaration      <$> read' f
+      "VariableDeclaration"      -> VariableDeclaration      <$> read' f
+      "VariableDeclarator"       -> VariableDeclarator       <$> read' f
+      "Decorator"                -> Decorator                <$> read' f
+      "Directive"                -> Directive                <$> read' f
+      "DirectiveLiteral"         -> DirectiveLiteral         <$> read' f
+      "Super"                    -> Super                    <$> read' f
+      "Import"                   -> Import                   <$> read' f
+      "ThisExpression"           -> ThisExpression           <$> read' f
+      "ArrowFunctionExpression"  -> ArrowFunctionExpression  <$> read' f
+      "YieldExpression"          -> YieldExpression          <$> read' f
+      "AwaitExpression"          -> AwaitExpression          <$> read' f
+      "ArrayExpression"          -> ArrayExpression          <$> read' f
+      "ObjectExpression"         -> ObjectExpression         <$> read' f
+      "ObjectProperty"           -> ObjectProperty           <$> read' f
+      "ObjectMethod"             -> ObjectMethod             <$> read' f
+      "FunctionExpression"       -> FunctionExpression       <$> read' f
+      "UnaryExpression"          -> UnaryExpression          <$> read' f
+      "UpdateExpression"         -> UpdateExpression         <$> read' f
+      "BinaryExpression"         -> BinaryExpression         <$> read' f
+      "AssignmentExpression"     -> AssignmentExpression     <$> read' f
+      "LogicalExpression"        -> LogicalExpression        <$> read' f
+      "SpreadElement"            -> SpreadElement            <$> read' f
+      "MemberExpression"         -> MemberExpression         <$> read' f
+      "BindExpression"           -> BindExpression           <$> read' f
+      "ConditionalExpression"    -> ConditionalExpression    <$> read' f
+      "CallExpression"           -> CallExpression           <$> read' f
+      "NewExpression"            -> NewExpression            <$> read' f
+      "SequenceExpression"       -> SequenceExpression       <$> read' f
+      "DoExpression"             -> DoExpression             <$> read' f
+      "TemplateLiteral"          -> TemplateLiteral          <$> read' f
+      "TaggedTemplateLiteral"    -> TaggedTemplateLiteral    <$> read' f
+      "TemplateElement"          -> TemplateElement          <$> read' f
+      "AssignmentProperty"       -> AssignmentProperty       <$> read' f
+      "ObjectPattern"            -> ObjectPattern            <$> read' f
+      "ArrayPattern"             -> ArrayPattern             <$> read' f
+      "RestElement"              -> RestElement              <$> read' f
+      "AssignmentPattern"        -> AssignmentPattern        <$> read' f
+      "ClassBody"                -> ClassBody                <$> read' f
+      "ClassMethod"              -> ClassMethod              <$> read' f
+      "ClassPrivateMethod"       -> ClassPrivateMethod       <$> read' f
+      "ClassProperty"            -> ClassProperty            <$> read' f
+      "ClassPrivateProperty"     -> ClassPrivateProperty     <$> read' f
+      "ClassDeclaration"         -> ClassDeclaration         <$> read' f
+      "ClassExpression"          -> ClassExpression          <$> read' f
+      "MetaProperty"             -> MetaProperty             <$> read' f
+      "ImportDeclaration"        -> ImportDeclaration        <$> read' f
+      "ImportDefaultSpecifier"   -> ImportDefaultSpecifier   <$> read' f
+      "ImportNamespaceSpecifier" -> ImportNamespaceSpecifier <$> read' f
+      "ExportNamedDeclaration"   -> ExportNamedDeclaration   <$> read' f
+      "ExportSpecifier"          -> ExportSpecifier          <$> read' f
+      "OptFunctionDeclaration"   -> OptFunctionDeclaration   <$> read' f
+      "OptClassDeclaration"      -> OptClassDeclaration      <$> read' f
+      "ExportDefaultDeclaration" -> ExportDefaultDeclaration <$> read' f
+      "ExportAllDeclaration"     -> ExportAllDeclaration     <$> read' f
+      _                          -> fail $ ForeignError "Doesn't match any known node type"
 
 data Node = Identifier  (Node' ( name :: String ))
           | PrivateName (Node' ( id :: Node {- Identifier -}))
@@ -199,7 +204,7 @@ data Node = Identifier  (Node' ( name :: String ))
           | ForInStatement   (ForInStatement' ())
           | ForOfStatement   (ForInStatement' ( await :: Boolean ))
             -- Declarations
-          | FunctionDeclaration (FunctionDeclaration' ( id :: Node ))
+          | FunctionDeclaration (Node' (Function' ( id :: Node )))
           | VariableDeclaration (Node' ( declarations :: Array Node -- VariableDeclarator
                                        , kind :: VariableKind
                                        )
@@ -316,7 +321,7 @@ data Node = Identifier  (Node' ( name :: String ))
                                         , static :: Boolean
                                         )
                                  )
-          | ClassDeclaration     (ClassDeclaration' ())
+          | ClassDeclaration     (Class ( id :: Node ))
           | ClassExpression      (Class ( id :: Maybe Node                   {- Identifier -}))
           | MetaProperty         (Node' ( meta :: Node                       -- Identifier
                                         , property :: Node                   -- Identifier
@@ -337,8 +342,8 @@ data Node = Identifier  (Node' ( name :: String ))
                                             )
                                      )
           | ExportSpecifier          (ModuleSpecifier ( exported :: Node      {- Identifier -}))
-          | OptFunctionDeclaration   (FunctionDeclaration' ( id :: Maybe Node {- Identifier -}))
-          | OptClassDeclaration      (ClassDeclaration' ( id :: Maybe Node    {- Identifier -}))
+          | OptFunctionDeclaration   (Node' (Function' ( id :: Maybe Node {- Identifier -})))
+          | OptClassDeclaration      (Class ( id :: Maybe Node    {- Identifier -}))
           | ExportDefaultDeclaration (Node' (declaration :: Node              {- OptFunctionDeclaration | OptClassDeclaration | Expression -}))
           | ExportAllDeclaration     (Node' ( source :: Node                  {- Literal -}))
 
@@ -471,7 +476,7 @@ instance showNode :: Show Node where
       "Import"
     ThisExpression _                         ->
       "ThisExpression"
-    ArrowFunctionExpression { id
+    ArrowFunctionExpression r@{ id
                             , params
                             , body
                             , generator
@@ -482,6 +487,7 @@ instance showNode :: Show Node where
       <> ", " <> show body
       <> ", " <> show generator
       <> ", " <> show async
+      <> ")"
     YieldExpression { argument, delegate }   ->
       "(YieldExpression " <> show argument
       <> ", " <> show delegate
@@ -802,16 +808,20 @@ type SourceLocation = { source :: Maybe String
                       , end :: Position
                       }
 
+
+
 type Node' r = { loc :: Maybe SourceLocation | r }
 
-type ClassDeclaration' r = Class ( id :: Node {- Identifier -} | r)
+type Function' r = ( params :: Array Node -- Pattern
+                   , generator :: Boolean
+                   , body :: Node         -- BlockStatement | Expression
+                   , async :: Boolean
+                   | r
+                   )
 
-type FunctionDeclaration' r = Node' (Function' ( id :: Node {- Identifier -} | r))
-
-type Class r = Node' ( id :: Node               -- Identifier
-                     , superClass :: Maybe Node -- Expression
+type Class r = Node' ( superClass :: Maybe Node -- Expression
                      , body :: Node             -- ClassBody
-                     , decorators :: Array Node -- Decorator
+                     , decorators :: Maybe (Array Node) -- Decorator
                      | r
                      )
 
@@ -842,13 +852,6 @@ type ForInStatement' r = Node' ( left :: Node       -- VariableDeclaration | Exp
                                | r
                                )
 
-type Function' r = ( params :: Array Node -- Pattern
-                   , generator :: Boolean
-                   , body :: Node         -- BlockStatement | Expression
-                   , async :: Boolean
-                   | r
-                   )
-
 type ImportSpecifier = ModuleSpecifier ( imported :: Node {- Identifier -})
 
 type ModuleSpecifier r = Node' ( local :: Node | r )
@@ -860,7 +863,34 @@ instance showLogicalOperator :: Show LogicalOperator where
   show Or  = "||"
   show And = "&&"
 
+instance readForeignLogicalOperator :: ReadForeign LogicalOperator where
+  readImpl f = do
+    v <- read' f
+    case v of
+      "||"    -> pure Or
+      "&&"    -> pure And
+      _       -> fail $ ForeignError "Unsupported logical operator"
+
 data AssignmentOperator = AssignmentOperator (Maybe BinaryOperator)
+
+instance readForeignAssignmentOperator :: ReadForeign AssignmentOperator where
+  readImpl f = do
+    v <- read' f
+    case v of
+      "="    -> pure $ AssignmentOperator Nothing
+      "<<="  -> pure $ AssignmentOperator (Just LeftShift)
+      ">>="  -> pure $ AssignmentOperator (Just RightShift)
+      ">>>=" -> pure $ AssignmentOperator (Just ZeroFillRightShift)
+      "+="   -> pure $ AssignmentOperator (Just Addition)
+      "-="   -> pure $ AssignmentOperator (Just Subtraction)
+      "*="   -> pure $ AssignmentOperator (Just Multiplication)
+      "/="   -> pure $ AssignmentOperator (Just Division)
+      "%="   -> pure $ AssignmentOperator (Just Remainder)
+      "**="  -> pure $ AssignmentOperator (Just Exponentiation)
+      "|="   -> pure $ AssignmentOperator (Just BitwiseOr)
+      "^="   -> pure $ AssignmentOperator (Just BitwiseXor)
+      "&="   -> pure $ AssignmentOperator (Just BitwiseAnd)
+      _      -> fail $ ForeignError "Unsupported assignment operator"
 
 derive instance eqAssignmentOperator :: Eq AssignmentOperator
 instance showAssignmentOperator :: Show AssignmentOperator where
@@ -905,6 +935,35 @@ data BinaryOperator = Equals
                     | Instanceof
                     | Pipe
 
+instance readForeignBinaryOperator :: ReadForeign BinaryOperator where
+  readImpl f = do
+    v <- read' f
+    case v of
+      "=="         -> pure Equals
+      "!="         -> pure NotEquals
+      "==="        -> pure Identical
+      "!=="        -> pure NotIdentical
+      "<"          -> pure LessThan
+      "<="         -> pure LessThanOrEquals
+      ">"          -> pure GreaterThan
+      ">="         -> pure GreaterThanOrEquals
+      "<<"         -> pure LeftShift
+      ">>"         -> pure RightShift
+      ">>>"        -> pure ZeroFillRightShift
+      "+"          -> pure Addition
+      "-"          -> pure Subtraction
+      "*"          -> pure Multiplication
+      "/"          -> pure Division
+      "%"          -> pure Remainder
+      "**"         -> pure Exponentiation
+      "|"          -> pure BitwiseOr
+      "^"          -> pure BitwiseXor
+      "&"          -> pure BitwiseAnd
+      "in"         -> pure In
+      "instanceof" -> pure Instanceof
+      "|>"         -> pure Pipe
+      _            -> fail $ ForeignError "Unsupported binary operator"
+
 derive instance eqBinaryOperator :: Eq BinaryOperator
 instance showBinaryOperator :: Show BinaryOperator where
   show = case _ of
@@ -934,6 +993,14 @@ instance showBinaryOperator :: Show BinaryOperator where
 
 data UpdateOperator = Increment | Decrement
 
+instance readForeignUpdateOperator :: ReadForeign UpdateOperator where
+  readImpl f = do
+    v <- read' f
+    case v of
+      "++" -> pure Increment
+      "--" -> pure Decrement
+      _    -> fail $ ForeignError "Unsupported update operator"
+
 derive instance eqUpdateOperator :: Eq UpdateOperator
 instance showUpdateOperator :: Show UpdateOperator where
   show Increment = "++"
@@ -960,7 +1027,31 @@ instance showUnaryOperator :: Show UnaryOperator where
     Delete     -> "delete"
     Throw      -> "throw"
 
+instance readForeignUnaryOperator :: ReadForeign UnaryOperator where
+  readImpl f = do
+    v <- read' f
+    case v of
+      "-"      -> pure Minus
+      "+"      -> pure Plus
+      "!"      -> pure Not
+      "~"      -> pure BitwiseNot
+      "typeof" -> pure Typeof
+      "void"   -> pure Void
+      "delete" -> pure Delete
+      "throw"  -> pure Throw
+      _        -> fail $ ForeignError "Unsupported unary operator"
+
 data MethodKind = Constructor | Get | Set | Method
+
+instance readForeignMethodKind :: ReadForeign MethodKind where
+  readImpl f = do
+    v <- read' f
+    case v of
+      "constructor" -> pure Constructor
+      "get"         -> pure Get
+      "set"         -> pure Set
+      "method"      -> pure Method
+      _             -> fail $ ForeignError "Unsupported method kind"
 
 derive instance genericMethodKind :: Generic MethodKind _
 instance showMethodKind :: Show MethodKind where
@@ -968,42 +1059,34 @@ instance showMethodKind :: Show MethodKind where
 
 data SourceType = Script | Module
 
+instance readForeignSourceType :: ReadForeign SourceType where
+  readImpl f = do
+    v <- read' f
+    case v of
+      "script" -> pure Script
+      "module" -> pure Module
+      _        -> fail $ ForeignError "Unsupported source type"
+
 derive instance genericSourceType :: Generic SourceType _
 instance showSourceType :: Show SourceType where
   show = genericShow
 
 data VariableKind = Var | Let | Const
 
+instance readForeignVariableKind :: ReadForeign VariableKind where
+  readImpl f = do
+    v <- read' f
+    case v of
+      "var" -> pure Var
+      "let" -> pure Let
+      "const" -> pure Const
+      _        -> fail $ ForeignError "Unsupported variable kind"
+
 derive instance genericVariableKind :: Generic VariableKind _
 instance showVariableKind :: Show VariableKind where
   show = genericShow
 
-foreign import data BabelAST :: Type
+foreign import _parseExpression :: String -> Foreign
 
-foreign import _parseExpression :: String -> BabelAST
-
-parseExpression :: String -> Node
-parseExpression src = convert $ _parseExpression src
-  where
-    convert ({ type: "ArrowFunctionExpression", params, body, generator, async }) =
-      ArrowFunctionExpression { loc: Nothing
-                              , params: convert <$> params
-                              , body: convert body
-                              , generator
-                              , async
-                              , id: Nothing
-                              }
-    convert ({ type: "BlockStatement", body, directives }) =
-      BlockStatement { loc: Nothing
-                     , body: convert <$> body
-                     , directives: convert <$> directives
-                     }
-
-    convert ({ type: "Identifier", name }) =
-      Identifier { loc: Nothing
-                 , name
-                 }
-    convert ({ type: "BooleanLiteral", value }) =
-      BooleanLiteral { loc: Nothing
-                     , value: value
-                     }
+parseExpression :: String -> F Node
+parseExpression = read' <<< _parseExpression
