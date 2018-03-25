@@ -12,27 +12,26 @@ module Babylon.Types
        , ModuleSpecifier
        , SourceLocation
        , Position
-       , LogicalOperator
-       , AssignmentOperator
-       , BinaryOperator
-       , UpdateOperator
+       , LogicalOperator(..)
+       , AssignmentOperator(..)
+       , BinaryOperator(..)
+       , UpdateOperator(..)
        , UnaryOperator(..)
-       , MethodKind
-       , SourceType
-       , VariableKind
+       , MethodKind(..)
+       , SourceType(..)
+       , VariableKind(..)
        , parseExpression
+       , parseExpression'
        ) where
 
 import Prelude
 
-import Control.Alt ((<|>))
-import Data.Either (Either(..))
 import Data.Foreign (F, Foreign, ForeignError(..), fail)
+import Data.Function.Uncurried (Fn2, runFn2)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Traversable (foldl)
-import Simple.JSON (class ReadForeign, read, read')
+import Simple.JSON (class ReadForeign, read')
 
 
 instance readForeignNode :: ReadForeign Node where
@@ -220,7 +219,7 @@ data Node = Identifier  (Node' ( name :: String ))
                                        , kind :: VariableKind
                                        )
                                 )
-          | VariableDeclarator  (Node' ( id :: Node                 -- Pattern
+          | VariableDeclarator  (Node' ( id :: Node                 -- Identifier | Pattern
                                        , init :: Maybe Node         -- Expression
                                        )
                                 )
@@ -1032,7 +1031,11 @@ derive instance genericVariableKind :: Generic VariableKind _
 instance showVariableKind :: Show VariableKind where
   show = genericShow
 
-foreign import _parseExpression :: String -> Foreign
 
-parseExpression :: String -> F Node
-parseExpression = read' <<< _parseExpression
+foreign import _parseExpression :: Fn2 String (Array String) Foreign
+
+parseExpression :: String -> Array String -> F Node
+parseExpression s = read' <<< runFn2 _parseExpression s
+
+parseExpression' :: String -> F Node
+parseExpression' s = parseExpression s []
