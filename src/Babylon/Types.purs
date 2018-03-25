@@ -22,6 +22,8 @@ module Babylon.Types
        , VariableKind(..)
        , parseExpression
        , parseExpression'
+       , parse
+       , parse'
        ) where
 
 import Prelude
@@ -1031,6 +1033,13 @@ derive instance genericVariableKind :: Generic VariableKind _
 instance showVariableKind :: Show VariableKind where
   show = genericShow
 
+foreign import _parse :: Fn2 String (Array String) Foreign
+
+parse :: String -> Array String -> F Node
+parse s = read' <<< runFn2 _parse s
+
+parse' :: String -> F Node
+parse' s = parse s []
 
 foreign import _parseExpression :: Fn2 String (Array String) Foreign
 
