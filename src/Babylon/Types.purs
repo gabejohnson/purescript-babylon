@@ -46,6 +46,7 @@ instance readForeignNode :: ReadForeign Node where
       "StringLiteral"            -> StringLiteral            <$> read' f
       "BooleanLiteral"           -> BooleanLiteral           <$> read' f
       "NumericLiteral"           -> NumericLiteral           <$> read' f
+      "File"                     -> File                     <$> read' f
       "Program"                  -> Program                  <$> read' f
       "ExpressionStatement"      -> ExpressionStatement      <$> read' f
       "BlockStatement"           -> BlockStatement           <$> read' f
@@ -138,6 +139,7 @@ data Node = Identifier  (Node' ( name :: String ))
           | NumericLiteral (Node' ( value :: Number ))
 
             -- Program
+          | File    (Node' ( program :: Node          {- Program -}))
           | Program (Node' ( sourceType :: SourceType
                            , body :: Array Node       -- Statement | ModuleDeclaration
                            , directives :: Array Node -- Directive
@@ -371,7 +373,8 @@ instance showNode :: Show Node where
     StringLiteral { value }                  -> "(StringLiteral " <> value <> ")"
     BooleanLiteral { value }                 -> "(BooleanLiteral " <> show value <> ")"
     NumericLiteral { value }                 -> "(NumericLiteral " <> show value <> ")"
-    Program { body }                         -> "Program " <> show body
+    File { program }                         -> "File " <> show program
+    Program { body }                         -> "(Program " <> show body <> ")"
     ExpressionStatement { expression }       -> "(Expression " <> show expression <> ")"
     BlockStatement { body }                  -> "(BlockStatement " <> show body <> ")"
     EmptyStatement _                         -> "EmptyStatement"
