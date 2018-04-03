@@ -8,7 +8,6 @@ module Babylon.Types
        , BinaryExpression'
        , CallExpression'
        , Class
-       , ImportSpecifier
        , ModuleSpecifier
        , SourceLocation
        , Position
@@ -346,12 +345,13 @@ data Node = Identifier  (Node' ( name :: String ))
 
             -- Modules
             -- Imports
-          | ImportDeclaration        (Node' ( local :: Node            -- Identifier
+          | ImportDeclaration        (Node' ( source :: Node           -- Literal
                                             , specifiers :: Array Node -- ImportSpecifier | ImportDefaultSpecifier | ImportNamespaceSpecifier
                                             )
                                      )
-          | ImportDefaultSpecifier   ImportSpecifier
-          | ImportNamespaceSpecifier ImportSpecifier
+          | ImportSpecifier          (ModuleSpecifier ( imported :: Node {- Identifier -}))
+          | ImportDefaultSpecifier   (ModuleSpecifier ())
+          | ImportNamespaceSpecifier (ModuleSpecifier ())
 
             -- Exports
           | ExportNamedDeclaration   (Node' ( declaration :: Maybe Node       -- Declaration
@@ -697,19 +697,16 @@ instance showNode :: Show Node where
     MetaProperty { meta, property }          -> "(MetaProperty " <> show meta
                                                 <> ", " <> show property
                                                 <> ")"
-    ImportDeclaration { local, specifiers }  -> "(ImportDeclaration " <> show local
+    ImportDeclaration { source, specifiers }  -> "(ImportDeclaration " <> show source
                                                 <> ", " <> show specifiers
                                                 <> ")"
-    ImportDefaultSpecifier { local
-                           , imported
-                           }                 -> "(ImportDefaultSpecifier " <> show local
-                                                <> ", " <> show imported
-                                                <> ")"
-    ImportNamespaceSpecifier { local
-                             , imported
-                             }               -> "(ImportNamespaceSpecifier " <> show local
-                                                <> ", " <> show imported
-                                                <> ")"
+    ImportSpecifier { local
+                    , imported
+                    }                         -> "(ImportSpecifier " <> show local
+                                                 <> ", " <> show imported
+                                                 <> ")"
+    ImportDefaultSpecifier { local }          -> "(ImportDefaultSpecifier " <> show local <> ")"
+    ImportNamespaceSpecifier { local }        -> "(ImportNamespaceSpecifier " <> show local <> ")"
     ExportNamedDeclaration { declaration
                            , specifiers
                            , source
@@ -794,8 +791,6 @@ type ForInStatement' r   = Node' ( left :: Node       -- VariableDeclaration | E
                                  , body :: Node       -- Statements
                                  | r
                                  )
-
-type ImportSpecifier     = ModuleSpecifier ( imported :: Node {- Identifier -})
 
 type ModuleSpecifier r   = Node' ( local :: Node | r )
 
