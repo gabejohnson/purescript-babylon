@@ -1014,6 +1014,7 @@ instance showSourceType :: Show SourceType where
   show = genericShow
 
 data VariableKind = Var | Let | Const
+derive instance eqVariableKind :: Eq VariableKind
 
 instance readForeignVariableKind :: ReadForeign VariableKind where
   readImpl f = do
@@ -1028,18 +1029,18 @@ derive instance genericVariableKind :: Generic VariableKind _
 instance showVariableKind :: Show VariableKind where
   show = genericShow
 
-foreign import _parse :: Fn2 String (Array String) Foreign
+foreign import _parse :: forall r. Fn2 String { | r } Foreign
 
-parse :: String -> Array String -> F Node
+parse :: forall r. String -> { | r } -> F Node
 parse s = read' <<< runFn2 _parse s
 
 parse' :: String -> F Node
-parse' s = parse s []
+parse' s = parse s { sourceType: "unambiguous" }
 
-foreign import _parseExpression :: Fn2 String (Array String) Foreign
+foreign import _parseExpression :: forall r. Fn2 String { | r } Foreign
 
-parseExpression :: String -> Array String -> F Node
+parseExpression :: forall r. String -> { | r } -> F Node
 parseExpression s = read' <<< runFn2 _parseExpression s
 
 parseExpression' :: String -> F Node
-parseExpression' s = parseExpression s []
+parseExpression' s = parseExpression s {}
