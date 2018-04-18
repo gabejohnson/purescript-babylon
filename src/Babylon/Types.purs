@@ -241,7 +241,7 @@ data Node = Identifier  (Node' ( name :: String ))
                                     )
           | AwaitExpression         (Node' ( argument :: Maybe Node         {- Expression -}))
           | ArrayExpression         (Node' ( elements :: Array (Maybe Node) {- Expression | SpreadElement -}))
-          | ObjectExpression        (Node' ( properties :: Array Node       {- ObjectProperty | ObjectMethod | SpreadElemnt] -}))
+          | ObjectExpression        (Node' ( properties :: Array Node       {- [ObjectProperty | ObjectMethod | SpreadElement] -}))
           | ObjectProperty          ObjectProperty'
           | ObjectMethod            (ObjectMember (Function' ( kind :: MethodKind )))
           | FunctionExpression      (Node' (Function' ( id :: Maybe Node     {- Identifier -})))
@@ -314,14 +314,14 @@ data Node = Identifier  (Node' ( name :: String ))
                                                    , kind :: MethodKind
                                                    , computed :: Boolean
                                                    , static :: Boolean
-                                                   , decorators :: Array Node -- Decorator
+                                                   , decorators :: Maybe (Array Node) -- Decorator
                                                    )
                                         )
                                  )
           | ClassPrivateMethod   (Node' (Function' ( key :: Node             -- PrivateName
                                                    , kind :: MethodKind
                                                    , static :: Boolean
-                                                   , decorators :: Array Node -- Decorator
+                                                   , decorators :: Maybe (Array Node) -- Decorator
                                                    )
                                         )
                                  )
@@ -782,7 +782,7 @@ type ObjectProperty'     = ObjectMember ( shorthand :: Boolean
 
 type ObjectMember r      = Node' ( key :: Node              -- Expression
                                  , computed :: Boolean
-                                 , decorators :: Array Node -- Decorator
+                                 , decorators :: Maybe (Array Node) -- Decorator
                                  | r
                                  )
 
