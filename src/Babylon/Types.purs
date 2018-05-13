@@ -27,13 +27,113 @@ module Babylon.Types
 
 import Prelude
 
-import Data.Foreign (F, Foreign, ForeignError(..), fail)
+import Data.Foreign (F, Foreign, ForeignError(..), fail, toForeign)
 import Data.Function.Uncurried (Fn2, runFn2)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(Just, Nothing))
-import Simple.JSON (class ReadForeign, read')
+import Data.Record (insert)
+import Simple.JSON (class ReadForeign, class WriteForeign, read', write, writeJSON)
+import Type.Data.Symbol (SProxy(..))
+import Type.Prelude (class RowLacks)
 
+
+instance writeForeignNode :: WriteForeign Node where
+  writeImpl n =
+    let insertType
+          :: forall r
+           . RowLacks "type" r
+          => String
+          -> { | r }
+          -> { type :: String | r }
+        insertType = insert (SProxy :: SProxy "type")
+    in do
+    case n of
+      Identifier               r -> write $ insertType "Identifier" r
+      PrivateName              r -> write $ insertType "PrivateName" r
+      RegExpLiteral            r -> write $ insertType "RegExpLiteral" r
+      NullLiteral              r -> write $ insertType "NullLiteral" r
+      StringLiteral            r -> write $ insertType "StringLiteral" r
+      BooleanLiteral           r -> write $ insertType "BooleanLiteral" r
+      NumericLiteral           r -> write $ insertType "NumericLiteral" r
+      File                     r -> write $ insertType "File" r
+      Program                  r -> write $ insertType "Program" r
+      ExpressionStatement      r -> write $ insertType "ExpressionStatement" r
+      BlockStatement           r -> write $ insertType "BlockStatement" r
+      EmptyStatement           r -> write $ insertType "EmptyStatement" r
+      DebuggerStatement        r -> write $ insertType "DebuggerStatement" r
+      WithStatement            r -> write $ insertType "WithStatement" r
+      ReturnStatement          r -> write $ insertType "ReturnStatement" r
+      LabeledStatement         r -> write $ insertType "LabeledStatement" r
+      BreakStatement           r -> write $ insertType "BreakStatement" r
+      ContinueStatement        r -> write $ insertType "ContinueStatement" r
+      IfStatement              r -> write $ insertType "IfStatement" r
+      SwitchStatement          r -> write $ insertType "SwitchStatement" r
+      SwitchCase               r -> write $ insertType "SwitchCase" r
+      ThrowStatement           r -> write $ insertType "ThrowStatement" r
+      TryStatement             r -> write $ insertType "TryStatement" r
+      CatchClause              r -> write $ insertType "CatchClause" r
+      WhileStatement           r -> write $ insertType "WhileStatement" r
+      DoWhileStatement         r -> write $ insertType "DoWhileStatement" r
+      ForStatement             r -> write $ insertType "ForStatement" r
+      ForInStatement           r -> write $ insertType "ForInStatement" r
+      ForOfStatement           r -> write $ insertType "ForOfStatement" r
+      FunctionDeclaration      r -> write $ insertType "FunctionDeclaration" r
+      VariableDeclaration      r -> write $ insertType "VariableDeclaration" r
+      VariableDeclarator       r -> write $ insertType "VariableDeclarator" r
+      Decorator                r -> write $ insertType "Decorator" r
+      Directive                r -> write $ insertType "Directive" r
+      DirectiveLiteral         r -> write $ insertType "DirectiveLiteral" r
+      Super                    r -> write $ insertType "Super" r
+      Import                   r -> write $ insertType "Import" r
+      ThisExpression           r -> write $ insertType "ThisExpression" r
+      ArrowFunctionExpression  r -> write $ insertType "ArrowFunctionExpression" r
+      YieldExpression          r -> write $ insertType "YieldExpression" r
+      AwaitExpression          r -> write $ insertType "AwaitExpression" r
+      ArrayExpression          r -> write $ insertType "ArrayExpression" r
+      ObjectExpression         r -> write $ insertType "ObjectExpression" r
+      ObjectProperty           r -> write $ insertType "ObjectProperty" r
+      ObjectMethod             r -> write $ insertType "ObjectMethod" r
+      FunctionExpression       r -> write $ insertType "FunctionExpression" r
+      UnaryExpression          r -> write $ insertType "UnaryExpression" r
+      UpdateExpression         r -> write $ insertType "UpdateExpression" r
+      BinaryExpression         r -> write $ insertType "BinaryExpression" r
+      AssignmentExpression     r -> write $ insertType "AssignmentExpression" r
+      LogicalExpression        r -> write $ insertType "LogicalExpression" r
+      SpreadElement            r -> write $ insertType "SpreadElement" r
+      MemberExpression         r -> write $ insertType "MemberExpression" r
+      BindExpression           r -> write $ insertType "BindExpression" r
+      ConditionalExpression    r -> write $ insertType "ConditionalExpression" r
+      CallExpression           r -> write $ insertType "CallExpression" r
+      -- "NewExpression"            -> NewExpression            <$> read' f
+      -- "SequenceExpression"       -> SequenceExpression       <$> read' f
+      -- "DoExpression"             -> DoExpression             <$> read' f
+      -- "TemplateLiteral"          -> TemplateLiteral          <$> read' f
+      -- "TaggedTemplateLiteral"    -> TaggedTemplateLiteral    <$> read' f
+      -- "TemplateElement"          -> TemplateElement          <$> read' f
+      -- "AssignmentProperty"       -> AssignmentProperty       <$> read' f
+      -- "ObjectPattern"            -> ObjectPattern            <$> read' f
+      -- "ArrayPattern"             -> ArrayPattern             <$> read' f
+      -- "RestElement"              -> RestElement              <$> read' f
+      -- "AssignmentPattern"        -> AssignmentPattern        <$> read' f
+      -- "ClassBody"                -> ClassBody                <$> read' f
+      -- "ClassMethod"              -> ClassMethod              <$> read' f
+      -- "ClassPrivateMethod"       -> ClassPrivateMethod       <$> read' f
+      -- "ClassProperty"            -> ClassProperty            <$> read' f
+      -- "ClassPrivateProperty"     -> ClassPrivateProperty     <$> read' f
+      -- "ClassDeclaration"         -> ClassDeclaration         <$> read' f
+      -- "ClassExpression"          -> ClassExpression          <$> read' f
+      -- "MetaProperty"             -> MetaProperty             <$> read' f
+      -- "ImportDeclaration"        -> ImportDeclaration        <$> read' f
+      -- "ImportDefaultSpecifier"   -> ImportDefaultSpecifier   <$> read' f
+      -- "ImportNamespaceSpecifier" -> ImportNamespaceSpecifier <$> read' f
+      -- "ExportNamedDeclaration"   -> ExportNamedDeclaration   <$> read' f
+      -- "ExportSpecifier"          -> ExportSpecifier          <$> read' f
+      -- "OptFunctionDeclaration"   -> OptFunctionDeclaration   <$> read' f
+      -- "OptClassDeclaration"      -> OptClassDeclaration      <$> read' f
+      -- "ExportDefaultDeclaration" -> ExportDefaultDeclaration <$> read' f
+      ExportAllDeclaration     r -> write $ insertType "ExportAllDeclaration" r
+      _                          -> write { type: "Unknown" }
 
 instance readForeignNode :: ReadForeign Node where
   readImpl f = do
@@ -366,379 +466,7 @@ data Node = Identifier  (Node' ( name :: String ))
           | ExportAllDeclaration     (Node' ( source :: Node                  {- Literal -}))
 
 instance showNode :: Show Node where
-  show = case _ of
-    Identifier { name }                      -> "(Identifier " <> name <> ")"
-    PrivateName { id }                       -> "(PrivateName " <> show id <> ")"
-    RegExpLiteral { pattern, flags }         -> "(RegExpLiteral /" <> pattern <> "/" <> flags <> ")"
-    NullLiteral _                            -> "NullLiteral"
-    StringLiteral { value }                  -> "(StringLiteral " <> value <> ")"
-    BooleanLiteral { value }                 -> "(BooleanLiteral " <> show value <> ")"
-    NumericLiteral { value }                 -> "(NumericLiteral " <> show value <> ")"
-    File { program }                         -> "File " <> show program
-    Program { body }                         -> "(Program " <> show body <> ")"
-    ExpressionStatement { expression }       -> "(Expression " <> show expression <> ")"
-    BlockStatement { body }                  -> "(BlockStatement " <> show body <> ")"
-    EmptyStatement _                         -> "EmptyStatement"
-    DebuggerStatement _                      -> "DebuggerStatement"
-    WithStatement { object, body }           -> "(WithStatement " <> show object
-                                                <> ", " <> show body
-                                                <> ")"
-    ReturnStatement { argument }             -> "(ReturnStatement " <> show argument <> ")"
-    LabeledStatement { label, body }         -> "(LabeledStatement " <> show label
-                                                <> ", " <> show body
-                                                <> ")"
-    BreakStatement { label }                 -> "(BreakStatement " <> show label <> ")"
-    ContinueStatement { label }              -> "(ContinueStatement " <> show label <> ")"
-    IfStatement { test
-                , consequent
-                , alternate
-                }                            -> "(IfStatement " <> show test
-                                                <> ", " <> show consequent
-                                                <> ", " <> show  alternate
-                                                <> ")"
-    SwitchStatement { discriminant, cases }  -> "(SwitchStatement " <> show discriminant
-                                                <> ", " <> show cases
-                                                <> ")"
-    SwitchCase { test, consequent }          -> "(SwitchCase " <> show test
-                                                <> ", " <> show consequent
-                                                <> ")"
-    ThrowStatement { argument }              -> "(ThrowStatement " <> show argument <> ")"
-    TryStatement { block
-                 , handler
-                 , finalizer
-                 }                           -> "(TryStatement " <> show block
-                                                <> ", " <> show handler
-                                                <> ", " <> show finalizer
-                                                <> ")"
-    CatchClause { param, body }              -> "(CatchClause " <> show param
-                                                <> ", " <> show body
-                                                <> ")"
-    WhileStatement { test, body }            -> "(WhileStatement " <> show test
-                                                <> ", " <> show body
-                                                <> ")"
-    DoWhileStatement { body, test }          -> "(DoWhileStatement " <> show body
-                                                <> ", " <> show test
-                                                <> ")"
-    ForStatement { init
-                 , test
-                 , update
-                 , body
-                 }                           -> "(ForStatement " <> show init
-                                                <> ", " <> show test
-                                                <> ", " <> show update
-                                                <> ", " <> show body
-                                                <> ")"
-    ForInStatement { left, right, body }     -> "(ForInStatement " <> show left
-                                                <> ", " <> show right
-                                                <> ", " <> show body
-                                                <> ")"
-    ForOfStatement { left
-                   , right
-                   , body
-                   , await
-                   }                         -> "(ForOfStatement " <> show left
-                                                <> ", " <> show right
-                                                <> ", " <> show body
-                                                <> ", " <> show await
-                                                <> ")"
-    FunctionDeclaration { id
-                        , params
-                        , body
-                        , generator
-                        , async
-                        }                    -> "(FunctionDeclaration " <> show id
-                                                <> ", " <> show params
-                                                <> ", " <> show body
-                                                <> ", " <> show generator
-                                                <> ", " <> show async
-                                                <> ")"
-    VariableDeclaration { declarations
-                        , kind
-                        }                    -> "(VariableDeclaration " <> show declarations
-                                                <> ", " <> show kind
-                                                <> ")"
-    VariableDeclarator { id, init }          -> "(VariableDeclarator " <> show id
-                                                <> ", " <> show init
-                                                <> ")"
-    Decorator { expression }                 -> "(Decorator " <> show expression <> ")"
-    Directive { value }                      -> "(Directive " <> show value <> ")"
-    DirectiveLiteral { value }               -> "(DirectiveLiteral " <> show value <> ")"
-    Super _                                  -> "Super"
-    Import _                                 -> "Import"
-    ThisExpression _                         -> "ThisExpression"
-    ArrowFunctionExpression { id
-                            , params
-                            , body
-                            , generator
-                            , async
-                            }                -> "(ArrowFunctionExpression " <> show id
-                                                <> ", " <> show params
-                                                <> ", " <> show body
-                                                <> ", " <> show generator
-                                                <> ", " <> show async
-                                                <> ")"
-    YieldExpression { argument, delegate }   -> "(YieldExpression " <> show argument
-                                                <> ", " <> show delegate
-                                                <> ")"
-    AwaitExpression { argument }             -> "(AwaitExpression " <> show argument <> ")"
-    ArrayExpression { elements }             -> "(ArrayExpression " <> show elements <> ")"
-    ObjectExpression { properties }          -> "(ObjectExpression " <> show properties <> ")"
-    ObjectProperty { key
-                   , value
-                   , computed
-                   , shorthand
-                   , decorators
-                   }                         -> "(ObjectProperty " <> show key
-                                                <> ", " <> show key
-                                                <> ", " <> show value
-                                                <> ", " <> show computed
-                                                <> ", " <> show shorthand
-                                                <> ", " <> show decorators
-                                                <> ")"
-    ObjectMethod { key
-                 , params
-                 , body
-                 , computed
-                 , decorators
-                 , generator
-                 , async
-                 }                           -> "(ObjectMethod " <> show key
-                                                <> ", " <> show params
-                                                <> ", " <> show body
-                                                <> ", " <> show computed
-                                                <> ", " <> show decorators
-                                                <> ", " <> show generator
-                                                <> ", " <> show async
-                                                <> ")"
-    FunctionExpression { id
-                       , params
-                       , body
-                       , generator
-                       , async
-                       }                     -> "(FunctionExpression " <> show id
-                                                <> ", " <> show params
-                                                <> ", " <> show body
-                                                <> ", " <> show generator
-                                                <> ", " <> show async
-                                                <> ")"
-    UnaryExpression { operator
-                    , prefix
-                    , argument
-                    }                        -> "(UnaryExpression " <> show operator
-                                                <> ", " <> show prefix
-                                                <> ", " <> show argument
-                                                <> ")"
-    UpdateExpression { operator
-                     , argument
-                     , prefix
-                     }                       -> "(UpdateExpression " <> show operator
-                                                <> ", " <> show prefix
-                                                <> ", " <> show argument
-                                                <> ")"
-    BinaryExpression { left
-                     , operator
-                     , right
-                     }                       -> "(BinaryExpression " <> show left
-                                                <> ", " <> show operator
-                                                <> ", " <> show right
-                                                <> ")"
-    AssignmentExpression { left
-                         , operator
-                         , right
-                         }                   -> "(AssignmentExpression " <> show left
-                                                <> ", " <> show operator
-                                                <> ", " <> show right
-                                                <> ")"
-    LogicalExpression { left
-                      , operator
-                      , right
-                      }                      -> "(LogicalExpression " <> show left
-                                                <> ", " <> show operator
-                                                <> ", " <> show right
-                                                <> ")"
-    SpreadElement { argument }               -> "(SpreadElement " <> show argument <> ")"
-    MemberExpression { object
-                     , property
-                     , computed
-                     , optional
-                     }                       -> "(MemberExpression " <> show object
-                                                <> ", " <> show property
-                                                <> ", " <> show computed
-                                                <> ", " <> show optional
-                                                <> ")"
-    BindExpression { object, callee }        -> "(BindExpression " <> show object
-                                                <> ", " <> show callee
-                                                <> ")"
-    ConditionalExpression { test
-                          , alternate
-                          , consequent
-                          }                  -> "(ConditionalExpression " <> show test
-                                                <> ", " <> show alternate
-                                                <> ", " <> show consequent
-                                                <> ")"
-    CallExpression { callee
-                   , arguments
-                   , optional
-                   }                         -> "(CallExpression " <> show callee
-                                                <> ", " <> show arguments
-                                                <> ", " <> show optional
-                                                <> ")"
-    NewExpression { callee
-                  , arguments
-                  , optional
-                  }                          -> "(NewExpression " <> show callee
-                                                <> ", " <> show arguments
-                                                <> ", " <> show optional
-                                                <> ")"
-    SequenceExpression { expressions }       -> "(SequenceExpression " <> show expressions <> ")"
-    DoExpression { body }                    -> "(DoExpression " <> show body <> ")"
-    TemplateLiteral { quasis, expressions }  -> "(TemplateLiteral " <> show quasis
-                                                <> ", " <> show expressions
-                                                <> ")"
-    TaggedTemplateLiteral { tag, quasi }     -> "(TaggedTemplateLiteral " <> show tag
-                                                <> ", " <> show quasi
-                                                <> ")"
-    TemplateElement { tail
-                    , value: { cooked
-                             , raw
-                             }
-                    }                        -> "(TemplateElement " <> show tail
-                                                <> ", cooked: " <> show cooked
-                                                <> ", raw: " <> show raw
-                                                <> ")"
-    AssignmentProperty { key
-                       , value
-                       , computed
-                       , shorthand
-                       , decorators
-                       }                     -> "(AssignmentProperty " <> show key
-                                                <> ", " <> show value
-                                                <> ", " <> show computed
-                                                <> ", " <> show shorthand
-                                                <> ", " <> show decorators
-                                                <> ")"
-    ObjectPattern { properties }             -> "(ObjectPattern " <> show properties <> ")"
-    ArrayPattern { elements }                -> "(ArrayPattern " <> show elements <> ")"
-    RestElement { argument }                 -> "(RestElement " <> show argument <> ")"
-    AssignmentPattern { left, right }        -> "(AssignmentPattern " <> show left
-                                                <> ", " <> show right
-                                                <> ")"
-    ClassBody { body }                       -> "(ClassBody " <> show body <> ")"
-    ClassMethod { key
-                , params
-                , body
-                , kind
-                , computed
-                , static
-                , decorators
-                , generator
-                , async
-                }                            -> "(ClassMethod " <> show key
-                                                <> ", " <> show params
-                                                <> ", " <> show body
-                                                <> ", " <> show kind
-                                                <> ", " <> show computed
-                                                <> ", " <> show static
-                                                <> ", " <> show decorators
-                                                <> ", " <> show generator
-                                                <> ", " <> show async
-                                                <> ")"
-    ClassPrivateMethod { key
-                       , params
-                       , body
-                       , kind
-                       , static
-                       , decorators
-                       , generator
-                       , async
-                       }                     -> "(ClassMethod " <> show key
-                                                <> ", " <> show params
-                                                <> ", " <> show body
-                                                <> ", " <> show kind
-                                                <> ", " <> show static
-                                                <> ", " <> show decorators
-                                                <> ", " <> show generator
-                                                <> ", " <> show async
-                                                <> ")"
-    ClassProperty { key
-                  , value
-                  , static
-                  , computed
-                  }                          -> "(ClassProperty " <> show key
-                                                <> ", " <> show value
-                                                <> ", " <> show static
-                                                <> ", " <> show computed
-                                                <> ")"
-    ClassPrivateProperty { key
-                         , value
-                         , static
-                         }                   -> "(ClassPrivateProperty " <> show key
-                                                <> ", " <> show value
-                                                <> ", " <> show static
-                                                <> ")"
-    ClassDeclaration { id
-                     , superClass
-                     , body
-                     , decorators
-                     }                       -> "(ClassDeclaration " <> show id
-                                                <> ", " <> show superClass
-                                                <> ", " <> show body
-                                                <> ", " <> show decorators
-                                                <> ")"
-    ClassExpression { id
-                    , superClass
-                    , body
-                    , decorators
-                    }                        -> "(ClassExpression " <> show id
-                                                <> ", " <> show superClass
-                                                <> ", " <> show body
-                                                <> ", " <> show decorators
-                                                <> ")"
-    MetaProperty { meta, property }          -> "(MetaProperty " <> show meta
-                                                <> ", " <> show property
-                                                <> ")"
-    ImportDeclaration { source, specifiers }  -> "(ImportDeclaration " <> show source
-                                                <> ", " <> show specifiers
-                                                <> ")"
-    ImportSpecifier { local
-                    , imported
-                    }                         -> "(ImportSpecifier " <> show local
-                                                 <> ", " <> show imported
-                                                 <> ")"
-    ImportDefaultSpecifier { local }          -> "(ImportDefaultSpecifier " <> show local <> ")"
-    ImportNamespaceSpecifier { local }        -> "(ImportNamespaceSpecifier " <> show local <> ")"
-    ExportNamedDeclaration { declaration
-                           , specifiers
-                           , source
-                           }                 -> "(ExportNamedDeclaration " <> show declaration
-                                                <> ", " <> show specifiers
-                                                <> ", " <> show source
-                                                <> ")"
-    ExportSpecifier { local, exported }      -> "(ExportSpecifier " <> show local
-                                                <> ", " <> show exported
-                                                <> ")"
-    OptFunctionDeclaration { id
-                           , params
-                           , body
-                           , generator
-                           , async
-                           }                 -> "(OptFunctionDeclaration " <> show id
-                                                <> ", " <> show params
-                                                <> ", " <> show body
-                                                <> ", " <> show generator
-                                                <> ", " <> show async
-                                                <> ")"
-    OptClassDeclaration { id
-                        , superClass
-                        , body
-                        , decorators
-                        }                    -> "(OptClassDeclaration " <> show id
-                                                <> ", " <> show superClass
-                                                <> ", " <> show body
-                                                <> ", " <> show decorators
-                                                <> ")"
-    ExportDefaultDeclaration { declaration } -> "(ExportDefaultDeclaration " <> show declaration <> ")"
-    ExportAllDeclaration { source }          -> "(ExportAllDeclaration " <> show source <> ")"
+  show = writeJSON
 
 type Position = { line :: Int
                 , column :: Int
@@ -811,6 +539,12 @@ instance readForeignLogicalOperator :: ReadForeign LogicalOperator where
       "&&"    -> pure And
       _       -> fail $ ForeignError "Unsupported logical operator"
 
+defaultWriteImpl :: forall a. Show a => a -> Foreign
+defaultWriteImpl = toForeign <<< show
+
+instance writeForeignOperator :: WriteForeign LogicalOperator where
+  writeImpl = defaultWriteImpl
+
 data AssignmentOperator = AssignmentOperator (Maybe BinaryOperator)
 
 instance readForeignAssignmentOperator :: ReadForeign AssignmentOperator where
@@ -833,6 +567,9 @@ instance readForeignAssignmentOperator :: ReadForeign AssignmentOperator where
       _      -> fail $ ForeignError "Unsupported assignment operator"
       where
         assign = pure <<< AssignmentOperator <<< Just
+
+instance writeForeignAssignmentOperator :: WriteForeign AssignmentOperator where
+  writeImpl = defaultWriteImpl
 
 derive instance eqAssignmentOperator :: Eq AssignmentOperator
 instance showAssignmentOperator :: Show AssignmentOperator where
@@ -906,6 +643,9 @@ instance readForeignBinaryOperator :: ReadForeign BinaryOperator where
       "|>"         -> pure Pipe
       _            -> fail $ ForeignError "Unsupported binary operator"
 
+instance writeForeignBinaryOperator :: WriteForeign BinaryOperator where
+  writeImpl = defaultWriteImpl
+
 derive instance eqBinaryOperator :: Eq BinaryOperator
 instance showBinaryOperator :: Show BinaryOperator where
   show = case _ of
@@ -942,6 +682,9 @@ instance readForeignUpdateOperator :: ReadForeign UpdateOperator where
       "++" -> pure Increment
       "--" -> pure Decrement
       _    -> fail $ ForeignError "Unsupported update operator"
+
+instance writeForeignUpdateOperator :: WriteForeign UpdateOperator where
+  writeImpl = defaultWriteImpl
 
 derive instance eqUpdateOperator :: Eq UpdateOperator
 instance showUpdateOperator :: Show UpdateOperator where
@@ -983,6 +726,9 @@ instance readForeignUnaryOperator :: ReadForeign UnaryOperator where
       "throw"  -> pure Throw
       _        -> fail $ ForeignError "Unsupported unary operator"
 
+instance writeForeignUnaryOperator :: WriteForeign UnaryOperator where
+  writeImpl = defaultWriteImpl
+
 data MethodKind = Constructor | Get | Set | Method
 
 instance readForeignMethodKind :: ReadForeign MethodKind where
@@ -994,6 +740,9 @@ instance readForeignMethodKind :: ReadForeign MethodKind where
       "set"         -> pure Set
       "method"      -> pure Method
       _             -> fail $ ForeignError "Unsupported method kind"
+
+instance writeForeignMethodKind :: WriteForeign MethodKind where
+  writeImpl = defaultWriteImpl
 
 derive instance genericMethodKind :: Generic MethodKind _
 instance showMethodKind :: Show MethodKind where
@@ -1008,6 +757,9 @@ instance readForeignSourceType :: ReadForeign SourceType where
       "script" -> pure Script
       "module" -> pure Module
       _        -> fail $ ForeignError "Unsupported source type"
+
+instance writeForeignSourceType :: WriteForeign SourceType where
+  writeImpl  = defaultWriteImpl
 
 derive instance genericSourceType :: Generic SourceType _
 instance showSourceType :: Show SourceType where
@@ -1024,6 +776,9 @@ instance readForeignVariableKind :: ReadForeign VariableKind where
       "let"   -> pure Let
       "const" -> pure Const
       _       -> fail $ ForeignError "Unsupported variable kind"
+
+instance writeForeignVariableKind :: WriteForeign VariableKind where
+  writeImpl = defaultWriteImpl
 
 derive instance genericVariableKind :: Generic VariableKind _
 instance showVariableKind :: Show VariableKind where
