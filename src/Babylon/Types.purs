@@ -105,33 +105,33 @@ instance writeForeignNode :: WriteForeign Node where
       BindExpression           r -> write $ insertType "BindExpression" r
       ConditionalExpression    r -> write $ insertType "ConditionalExpression" r
       CallExpression           r -> write $ insertType "CallExpression" r
-      -- "NewExpression"            -> NewExpression            <$> read' f
-      -- "SequenceExpression"       -> SequenceExpression       <$> read' f
-      -- "DoExpression"             -> DoExpression             <$> read' f
-      -- "TemplateLiteral"          -> TemplateLiteral          <$> read' f
-      -- "TaggedTemplateLiteral"    -> TaggedTemplateLiteral    <$> read' f
-      -- "TemplateElement"          -> TemplateElement          <$> read' f
-      -- "AssignmentProperty"       -> AssignmentProperty       <$> read' f
-      -- "ObjectPattern"            -> ObjectPattern            <$> read' f
-      -- "ArrayPattern"             -> ArrayPattern             <$> read' f
-      -- "RestElement"              -> RestElement              <$> read' f
-      -- "AssignmentPattern"        -> AssignmentPattern        <$> read' f
-      -- "ClassBody"                -> ClassBody                <$> read' f
-      -- "ClassMethod"              -> ClassMethod              <$> read' f
-      -- "ClassPrivateMethod"       -> ClassPrivateMethod       <$> read' f
-      -- "ClassProperty"            -> ClassProperty            <$> read' f
-      -- "ClassPrivateProperty"     -> ClassPrivateProperty     <$> read' f
-      -- "ClassDeclaration"         -> ClassDeclaration         <$> read' f
-      -- "ClassExpression"          -> ClassExpression          <$> read' f
-      -- "MetaProperty"             -> MetaProperty             <$> read' f
-      -- "ImportDeclaration"        -> ImportDeclaration        <$> read' f
-      -- "ImportDefaultSpecifier"   -> ImportDefaultSpecifier   <$> read' f
-      -- "ImportNamespaceSpecifier" -> ImportNamespaceSpecifier <$> read' f
-      -- "ExportNamedDeclaration"   -> ExportNamedDeclaration   <$> read' f
-      -- "ExportSpecifier"          -> ExportSpecifier          <$> read' f
-      -- "OptFunctionDeclaration"   -> OptFunctionDeclaration   <$> read' f
-      -- "OptClassDeclaration"      -> OptClassDeclaration      <$> read' f
-      -- "ExportDefaultDeclaration" -> ExportDefaultDeclaration <$> read' f
+      NewExpression            r -> write $ insertType "NewExpression"  r
+      SequenceExpression       r -> write $ insertType "SequenceExpression" r
+      DoExpression             r -> write $ insertType "DoExpression" r
+      TemplateLiteral          r -> write $ insertType "TemplateLiteral" r
+      TaggedTemplateLiteral    r -> write $ insertType "TaggedTemplateLiteral" r
+      TemplateElement          r -> write $ insertType "TemplateElement" r
+      AssignmentProperty       r -> write $ insertType "AssignmentProperty" r
+      ObjectPattern            r -> write $ insertType "ObjectPattern" r
+      ArrayPattern             r -> write $ insertType "ArrayPattern" r
+      RestElement              r -> write $ insertType "RestElement" r
+      AssignmentPattern        r -> write $ insertType "AssignmentPattern" r
+      ClassBody                r -> write $ insertType "ClassBody" r
+      ClassMethod              r -> write $ insertType "ClassMethod" r
+      ClassPrivateMethod       r -> write $ insertType "ClassPrivateMethod" r
+      ClassProperty            r -> write $ insertType "ClassProperty" r
+      ClassPrivateProperty     r -> write $ insertType "ClassPrivateProperty" r
+      ClassDeclaration         r -> write $ insertType "ClassDeclaration" r
+      ClassExpression          r -> write $ insertType "ClassExpression" r
+      MetaProperty             r -> write $ insertType "MetaProperty" r
+      ImportDeclaration        r -> write $ insertType "ImportDeclaration" r
+      ImportDefaultSpecifier   r -> write $ insertType "ImportDefaultSpecifier" r
+      ImportNamespaceSpecifier r -> write $ insertType "ImportNamespaceSpecifier" r
+      ExportNamedDeclaration   r -> write $ insertType "ExportNamedDeclaration" r
+      ExportSpecifier          r -> write $ insertType "ExportSpecifier" r
+      OptFunctionDeclaration   r -> write $ insertType "OptFunctionDeclaration" r
+      OptClassDeclaration      r -> write $ insertType "OptClassDeclaration" r
+      ExportDefaultDeclaration r -> write $ insertType "ExportDefaultDeclaration" r
       ExportAllDeclaration     r -> write $ insertType "ExportAllDeclaration" r
       _                          -> write { type: "Unknown" }
 
