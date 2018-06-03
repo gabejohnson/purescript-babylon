@@ -1,0 +1,13 @@
+{
+  "name": "purescript-babylon",
+  "set": "psc-0.12.0",
+  "source": "https://github.com/purescript/package-sets.git",
+  "depends": [
+    "console",
+    "maybe",
+    "generics-rep",
+    "foreign",
+    "simple-json",
+    "psci-support"
+  ]
+}
