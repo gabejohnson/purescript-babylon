@@ -27,22 +27,22 @@ module Babylon.Types
 
 import Prelude
 
-import Data.Foreign (F, Foreign, ForeignError(..), fail, toForeign)
+import Foreign (F, Foreign, ForeignError(..), fail, unsafeToForeign)
 import Data.Function.Uncurried (Fn2, runFn2)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Record (insert)
+import Record (insert)
 import Simple.JSON (class ReadForeign, class WriteForeign, read', write, writeJSON)
 import Type.Data.Symbol (SProxy(..))
-import Type.Prelude (class RowLacks)
+import Prim.Row (class Lacks)
 
 
 instance writeForeignNode :: WriteForeign Node where
   writeImpl n =
     let insertType
           :: forall r
-           . RowLacks "type" r
+           . Lacks "type" r
           => String
           -> { | r }
           -> { type :: String | r }
@@ -540,7 +540,7 @@ instance readForeignLogicalOperator :: ReadForeign LogicalOperator where
       _       -> fail $ ForeignError "Unsupported logical operator"
 
 defaultWriteImpl :: forall a. Show a => a -> Foreign
-defaultWriteImpl = toForeign <<< show
+defaultWriteImpl = unsafeToForeign <<< show
 
 instance writeForeignOperator :: WriteForeign LogicalOperator where
   writeImpl = defaultWriteImpl
