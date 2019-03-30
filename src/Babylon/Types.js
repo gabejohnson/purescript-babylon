@@ -1,10 +1,9 @@
-"use strict";
+'use strict';
 
-var babylon = require('babylon');
-
-// (String, Options | null) -> Foreign
-exports._parse = babylon.parse;
+var parser = require('@babel/parser');
 
 // (String, Options | null) -> Foreign
-exports._parseExpression = babylon.parseExpression;
+exports._parse = parser.parse;
 
+// (String, Options | null) -> Foreign
+exports._parseExpression = parser.parseExpression;
