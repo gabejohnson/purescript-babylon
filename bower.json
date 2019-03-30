@@ -2,12 +2,12 @@
   "name": "purescript-babylon",
   "ignore": ["**/.*", "node_modules", "bower_components", "output"],
   "dependencies": {
-    "purescript-prelude": "~4.0.0",
-    "purescript-console": "~4.1.0",
-    "purescript-maybe": "~4.0.0",
-    "purescript-generics-rep": "~6.0.0",
+    "purescript-prelude": "~4.1.0",
+    "purescript-console": "~4.2.0",
+    "purescript-maybe": "~4.0.1",
+    "purescript-generics-rep": "~6.1.1",
     "purescript-foreign": "~5.0.0",
-    "purescript-simple-json": "~4.0.0"
+    "purescript-simple-json": "~5.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "~4.0.0"
